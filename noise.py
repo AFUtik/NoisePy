@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import numpy as np
 import math
 
-class NoiseGenerator:
-  def __init__(self, M, N, w, h):
+np.random.seed(0)
+
+class PerlinNoise:
+  def __init__(self, M, N, w, h) -> None:
     self.M = M
     self.N = N
     self.w = w
@@ -49,33 +50,61 @@ class NoiseGenerator:
     result = self.g(cx1, cx2, be)
     return result
 
-  def generate_noise_map(self):
+  def generate_noise_map(self) -> np.array:
     MW = (self.M - 1) * self.w
     MH = (self.N - 1) * self.h
     x = np.linspace(0, self.M, MW)
     y = np.linspace(0, self.N, MH)
     XX, YY = np.meshgrid(x, y)
     ZZ = np.zeros((MH, MW))
+  
     for inX in range(MW):
         for inY in range(MH):
             ZZ[inY, inX] = self.noise(inY, inX, self.M, self.N)
-    return XX, YY, ZZ
+    return ZZ
 
+class RectNoise:
+  def __init__(self, genStep : int, zscale : int, mapsizex : int, mapsizey : int, recSizex : int, recSizey : int) -> None:
+    self.genStep = genStep
+    self.zscale = zscale
+    self.mapsizex = mapsizex
+    self.mapsizey = mapsizey
+    self.recSizex = recSizex
+    self.recSizey = recSizey
+   
+  def generate(self) -> np.array:
+    HM = np.zeros((self.mapsizex, self.mapsizey))
+    for _ in range(self.genStep):
+        x1 = np.random.randint(0, self.mapsizex)
+        y1 = np.random.randint(0, self.mapsizey)
+        x2 = x1 + self.recSizex // 4 + np.random.randint(0, self.recSizex)
+        y2 = y1 + self.recSizey // 4 + np.random.randint(0, self.recSizey)
+        
+        x2 = min(x2, self.mapsizex)
+        y2 = min(y2, self.mapsizey)
+        
+        for i2 in range(x1, x2):
+            for j2 in range(y1, y2):
+                HM[i2][j2] += self.zscale / self.genStep + np.random.rand() * 50 / 50.0
+    return HM
+    
+def merge_noise(arr1: np.array, arr2: np.array) -> np.array:
+  return arr1 + arr2
+   
 def main():
-  M = 5
-  N = 5
-  w = 10
-  h = 10
+  M = 20
+  N = 20
+  w = 7
+  h = 7
 
-  noise1 = NoiseGenerator(w, h, M, N)
-  XX, YY, ZZ = noise1.generate_noise_map()
-  fig = plt.figure(figsize=(8, 8))
-  ax = fig.add_subplot(projection="3d")
-  ax.plot_surface(YY, XX, ZZ, cmap=cm.inferno)
-  ax.set_zlim(-80, 80)
-  ax.set_xlabel('x')
-  ax.set_ylabel('y')
-  ax.set_zlabel('z')
+  perlinNoise = PerlinNoise(w, h, M, N)
+  noise1 = perlinNoise.generate_noise_map()
+  rectNoise = RectNoise(genStep=1024, zscale=512, mapsizex=M*(w-1), mapsizey=N*(h-1), recSizey=12, recSizex=12)
+  noise2 = rectNoise.generate()
+
+  noise3 = merge_noise(noise1, noise2)
+
+  plt.imshow(noise3, origin='upper')
   plt.show()
 
 if __name__ == '__main__':
