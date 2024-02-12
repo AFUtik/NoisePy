@@ -10,8 +10,9 @@ class PerlinNoise:
     self.N = N
     self.w = w
     self.h = h
-    self.R = np.round(3 * np.random.rand(self.N, self.M))
-    self.V = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]])
+    self.R = np.round(7 * np.random.rand(self.N, self.M))
+    self.V = np.array([[0, 1], [0, -1], [1, 0], [-1, 0],
+                       [1, 1], [-1, -1], [1, -1], [-1, 1]])
 
   def f(self, t):
     return t * t * t * ((6 * t - 15) * t + 10)
@@ -50,7 +51,7 @@ class PerlinNoise:
     result = self.g(cx1, cx2, be)
     return result
 
-  def generate_noise_map(self) -> np.array:
+  def generate(self) -> np.array:
     MW = (self.M - 1) * self.w
     MH = (self.N - 1) * self.h
     x = np.linspace(0, self.M, MW)
@@ -87,24 +88,27 @@ class RectNoise:
             for j2 in range(y1, y2):
                 HM[i2][j2] += self.zscale / self.genStep + np.random.rand() * 50 / 50.0
     return HM
-    
+
 def merge_noise(arr1: np.array, arr2: np.array) -> np.array:
   return arr1 + arr2
    
 def main():
-  M = 20
-  N = 20
-  w = 7
-  h = 7
+  M = 5
+  N = 5
+  w = 15
+  h = 15
 
   perlinNoise = PerlinNoise(w, h, M, N)
-  noise1 = perlinNoise.generate_noise_map()
+  noise1 = perlinNoise.generate()
   rectNoise = RectNoise(genStep=1024, zscale=512, mapsizex=M*(w-1), mapsizey=N*(h-1), recSizey=12, recSizex=12)
   noise2 = rectNoise.generate()
 
   noise3 = merge_noise(noise1, noise2)
 
-  plt.imshow(noise3, origin='upper')
+  #diamondSquareNoise = DiamondSquare(M*(w-1), N*(h-1), 2)
+  #noise1 = diamondSquareNoise.generate()
+
+  plt.imshow(noise1, cmap='gray', origin='upper')
   plt.show()
 
 if __name__ == '__main__':
