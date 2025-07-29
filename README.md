@@ -1,6 +1,5 @@
 # NoisePy
-Hello, this project provides 2-Dimensional Perlin Noise with filters for detailed landscape. This noise uses hash to generate values on x and y, so    
-Noise doesn't require providing a width or a height of space, but you can implement with def `determine(weight, height)` for limited space.
+Hello, this project provides 2-Dimensional Perlin Noise with filters for detailed landscape. This noise uses hash to generate values on x and y, so the noise doesn't require providing a width or a height of space,   but you can implement with def `determine(weight, height)` for limited space.
 
 
 ### Example
