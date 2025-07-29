@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import time as time
 
 from numba import njit
 
@@ -92,12 +91,8 @@ def main():
   w = 500
   h = 500
 
-  start = start = time.perf_counter()
   perlinNoise = PerlinNoise(scale=(50, 50))
   noise1 = perlinNoise.determine(w, h)
-
-  end = time.perf_counter()
-  print(f"Time of execution: {end - start:.4f} seconds")
 
   Z = noise1
   X = np.arange(Z.shape[1])
